@@ -29,7 +29,7 @@ Implement the main book listing page with search functionality, pagination, and 
   - Star ratings (for logged-in users only)
   - Review count (for logged-in users only)
   - Heart icon for favorites (for logged-in users only)
-  - "View Details" button
+  - "View Details" button (for logged-in users only)
 
 ### 4. Pagination Component
 - Traditional pagination buttons (not infinite scroll)
@@ -39,8 +39,8 @@ Implement the main book listing page with search functionality, pagination, and 
 - 12 books per page limit
 
 ### 5. Guest vs Logged-in User Experience
-- **Guest Users**: See book title, author, description, and "View Details" button only
-- **Logged-in Users**: Additionally see ratings, review count, and favorite heart icon
+- **Guest Users**: See book title, author, description
+- **Logged-in Users**: Additionally see ratings, review count favorite heart icon and and "View Details" button only
 
 ## Technical Requirements
 - Use skip/limit for pagination (not page/pageSize)

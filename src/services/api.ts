@@ -61,6 +61,26 @@ class ApiService {
     }
   }
 
+  // Method for full URL requests (used by middleware)
+  public async getFullUrl<T>(fullUrl: string, params?: any): Promise<ApiResponse<T>> {
+    try {
+      // Use axios directly without the configured baseURL to avoid duplication
+      const response = await axios.get(fullUrl, { 
+        params,
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(localStorage.getItem('authToken') && {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          })
+        }
+      });
+      return response.data;
+    } catch (error: any) {
+      throw this.handleError(error);
+    }
+  }
+
   public async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     try {
       const response = await this.api.post(`/v1${endpoint}`, data);
@@ -114,7 +134,18 @@ class ApiService {
       throw this.handleError(error);
     }
   }
+
+  // Get base URL for API calls
+  public getBaseURL(): string {
+    return this.baseURL + '/v1';
+  }
 }
 
 export const apiService = new ApiService();
+
+// Export getBase function for use in actions
+export const getBase = (): string => {
+  return process.env.REACT_APP_API_URL || 'http://localhost:5001';
+};
+
 export default apiService;

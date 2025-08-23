@@ -25,7 +25,7 @@ const apiMiddleware: Middleware = (store) => (next) => async (action: any) => {
     
     switch (method) {
       case 'GET':
-        response = await apiService.get(url, data);
+        response = await apiService.getFullUrl(url, data);
         break;
       case 'POST':
         response = await apiService.post(url, data);
