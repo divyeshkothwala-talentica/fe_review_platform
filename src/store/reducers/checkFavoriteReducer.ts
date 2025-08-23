@@ -5,6 +5,7 @@ import {
     CHECK_FAVORITE_REQUEST,
     CHECK_FAVORITE_SUCCESS,
     UPDATE_FAVORITE_STATUS,
+    CLEAR_FAVORITE_STATUS,
 } from '../actions/checkFavoriteActions';
 
 const checkFavoriteReducer: getReducerType = (
@@ -43,12 +44,24 @@ const checkFavoriteReducer: getReducerType = (
                 },
             });
         case UPDATE_FAVORITE_STATUS:
-            return Object.assign({}, state, {
+            console.log('UPDATE_FAVORITE_STATUS reducer received:', {
+                bookId: action.response.bookId,
+                isFavorite: action.response.isFavorite,
+                currentState: state.favoriteStatuses
+            });
+            const newState = Object.assign({}, state, {
                 loading: false,
                 favoriteStatuses: {
                     ...state.favoriteStatuses,
                     [action.response.bookId]: action.response.isFavorite,
                 },
+            });
+            console.log('New favoriteStatuses after update:', newState.favoriteStatuses);
+            return newState;
+        case CLEAR_FAVORITE_STATUS:
+            return Object.assign({}, state, {
+                loading: false,
+                favoriteStatuses: {},
             });
     }
     return state;

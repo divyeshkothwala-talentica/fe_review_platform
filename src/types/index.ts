@@ -25,6 +25,7 @@ export interface Book {
 // Review types
 export interface Review {
   _id: string;
+  id?: string; // Backend sometimes returns id instead of _id
   bookId: string;
   userId: string;
   text: string;

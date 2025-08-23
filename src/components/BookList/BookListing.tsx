@@ -4,11 +4,13 @@ import { getBooksAction } from '../../store/actions/getBooksActions';
 import { searchBooksAction, clearSearchResults } from '../../store/actions/searchBooksActions';
 import { addFavoriteAction } from '../../store/actions/addFavoriteActions';
 import { removeFavoriteAction } from '../../store/actions/removeFavoriteActions';
-import { checkFavoriteAction, updateFavoriteStatus } from '../../store/actions/checkFavoriteActions';
+import { updateFavoriteStatus, clearFavoriteStatus } from '../../store/actions/checkFavoriteActions';
+import { getFavoritesAction } from '../../store/actions/getFavoritesActions';
 
 import SearchBar from './SearchBar';
 import BookGrid from './BookGrid';
 import Pagination from './Pagination';
+import BookDetailsModal from '../BookDetails/BookDetailsModal';
 
 const BookListing: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -16,12 +18,19 @@ const BookListing: React.FC = () => {
   const booksState = useAppSelector((state) => state.books);
   const searchState = useAppSelector((state) => state.search);
   const favoriteStatusState = useAppSelector((state) => state.favoriteStatus);
+  const favoritesState = useAppSelector((state) => {
+    console.log('favoritesState selector called, state.favorites:', state.favorites);
+    return state.favorites;
+  });
 
   // Component state for pagination and search
   const [, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [favoriteErrors, setFavoriteErrors] = useState<{[key: string]: string}>({});
+  
+  // Modal state - each book maintains its own modal state
+  const [openModals, setOpenModals] = useState<{[bookId: string]: boolean}>({});
   
   // Track which books we've already checked to prevent duplicate API calls
   const checkedBooksRef = useRef<Set<string>>(new Set());
@@ -49,27 +58,59 @@ const BookListing: React.FC = () => {
     }
   }, [dispatch, isSearching, booksState.data.books.length]);
 
-  // Check favorite status for loaded books (only for authenticated users)
+  // Fetch user favorites when user logs in (bulk fetch - more efficient)
   useEffect(() => {
-    // Only check favorites if user is properly authenticated with a valid token
-    if (isAuthenticated && authState.data.token && authState.data.user && books.length > 0) {
-      books.forEach((book: any) => {
-        // Only check if we haven't already made a request for this book
-        if (!checkedBooksRef.current.has(book._id)) {
-          // Mark as checked to prevent duplicate requests
-          checkedBooksRef.current.add(book._id);
-          dispatch(checkFavoriteAction(book._id) as any);
+    console.log('Favorites fetch useEffect triggered:', {
+      isAuthenticated,
+      hasToken: !!authState.data.token,
+      hasUser: !!authState.data.user,
+      authState: authState.data
+    });
+    
+    if (isAuthenticated && authState.data.token && authState.data.user) {
+      console.log('Conditions met, dispatching getFavoritesAction...');
+      dispatch(getFavoritesAction(0, 50, false) as any);
+      console.log('getFavoritesAction dispatched');
+    } else {
+      console.log('Conditions NOT met for fetching favorites');
+    }
+  }, [isAuthenticated, authState.data.token, authState.data.user, dispatch]);
+
+  // Process fetched favorites and update heart icon states
+  useEffect(() => {
+    console.log('Favorites processing useEffect triggered:', {
+      favoritesState: favoritesState,
+      hasFavoritesData: !!favoritesState.data,
+      favoritesArray: favoritesState.data?.favorites,
+      favoritesLength: favoritesState.data?.favorites?.length
+    });
+    
+    if (favoritesState.data?.favorites && favoritesState.data.favorites.length > 0) {
+      console.log('Favorites fetched:', favoritesState.data.favorites);
+      
+      // Update favorite status for each fetched favorite
+      favoritesState.data.favorites.forEach((favorite: any) => {
+        const bookId = favorite.bookId || favorite.book?._id || favorite._id;
+        console.log('Processing favorite:', favorite, 'extracted bookId:', bookId);
+        
+        if (bookId) {
+          console.log('About to dispatch updateFavoriteStatus for bookId:', bookId);
+          dispatch(updateFavoriteStatus(bookId, true));
+          console.log('Dispatched updateFavoriteStatus for bookId:', bookId);
         }
       });
     }
-  }, [isAuthenticated, authState.data.token, authState.data.user, books, dispatch]);
+  }, [favoritesState.data?.favorites, dispatch]);
 
-  // Clear checked books when user logs out
+  // Clear favorite status when user logs out
   useEffect(() => {
     if (!isAuthenticated) {
+      // Clear all favorite statuses when user logs out
+      // This ensures heart icons are hidden for non-authenticated users
       checkedBooksRef.current.clear();
+      dispatch(clearFavoriteStatus());
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, dispatch]);
 
   // Handle search
   const handleSearch = useCallback((term: string) => {
@@ -109,10 +150,20 @@ const BookListing: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, isSearching, searchTerm]);
 
-  // Handle book click (for future book details modal)
+  // Handle book click - open modal for specific book
   const handleBookClick = useCallback((bookId: string) => {
-    // TODO: Implement book details modal
-    console.log('Book clicked:', bookId);
+    setOpenModals(prev => ({
+      ...prev,
+      [bookId]: true
+    }));
+  }, []);
+
+  // Handle modal close for specific book
+  const handleModalClose = useCallback((bookId: string) => {
+    setOpenModals(prev => ({
+      ...prev,
+      [bookId]: false
+    }));
   }, []);
 
   // Handle favorite toggle with optimistic updates
@@ -271,9 +322,14 @@ const BookListing: React.FC = () => {
           loading={loading}
           onBookClick={handleBookClick}
           onFavoriteToggle={handleFavoriteToggle}
-          favoriteBookIds={Object.keys(favoriteStatusState.favoriteStatuses || {}).filter(
-            bookId => favoriteStatusState.favoriteStatuses?.[bookId]
-          )}
+          favoriteBookIds={(() => {
+            const favoriteIds = Object.keys(favoriteStatusState.favoriteStatuses || {}).filter(
+              bookId => favoriteStatusState.favoriteStatuses?.[bookId]
+            );
+            console.log('favoriteStatusState:', favoriteStatusState);
+            console.log('Passing favoriteBookIds to BookGrid:', favoriteIds);
+            return favoriteIds;
+          })()}
           showNoResults={showNoResults}
           searchTerm={searchTerm}
         />
@@ -292,6 +348,18 @@ const BookListing: React.FC = () => {
           />
         )}
       </div>
+
+      {/* Book Details Modals - render modal for each open book */}
+      {books.map((book: any) => 
+        openModals[book._id] ? (
+          <BookDetailsModal
+            key={book._id}
+            book={book}
+            isOpen={true}
+            onClose={() => handleModalClose(book._id)}
+          />
+        ) : null
+      )}
     </div>
   );
 };
