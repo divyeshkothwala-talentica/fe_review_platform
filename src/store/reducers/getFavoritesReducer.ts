@@ -4,6 +4,7 @@ import {
     GET_FAVORITES_FAILURE,
     GET_FAVORITES_REQUEST,
     GET_FAVORITES_SUCCESS,
+    APPEND_FAVORITES_SUCCESS,
     UPDATE_FAVORITES_TASK,
 } from '../actions/getFavoritesActions';
 
@@ -16,17 +17,31 @@ const getFavoritesReducer: getReducerType = (
     }
     switch (action.type) {
         case GET_FAVORITES_REQUEST:
+            console.log('GET_FAVORITES_REQUEST received');
             return Object.assign({}, state, {
                 loading: true,
                 data: state.data || {},
             });
 
         case GET_FAVORITES_SUCCESS:
+            console.log('GET_FAVORITES_SUCCESS received:', action.response);
+            console.log('Extracting data from response:', action.response.data);
             return Object.assign({}, state, {
                 loading: false,
-                data: action.response.data.data,
+                data: action.response.data, // Changed from action.response.data.data
+            });
+        case APPEND_FAVORITES_SUCCESS:
+            const existingFavorites = state.data?.favorites || [];
+            const newFavorites = action.response.data.favorites || [];
+            return Object.assign({}, state, {
+                loading: false,
+                data: {
+                    ...action.response.data,
+                    favorites: [...existingFavorites, ...newFavorites],
+                },
             });
         case GET_FAVORITES_FAILURE:
+            console.log('GET_FAVORITES_FAILURE received:', action.error);
             return Object.assign({}, state, {
                 loading: false,
                 error: true,

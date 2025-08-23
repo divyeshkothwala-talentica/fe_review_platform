@@ -8,20 +8,36 @@ export const GET_FAVORITES_REQUEST = 'GET_FAVORITES_REQUEST';
 export const GET_FAVORITES_SUCCESS = 'GET_FAVORITES_SUCCESS';
 export const GET_FAVORITES_FAILURE = 'GET_FAVORITES_FAILURE';
 
+export const APPEND_FAVORITES_SUCCESS = 'APPEND_FAVORITES_SUCCESS';
 export const UPDATE_FAVORITES_TASK = 'UPDATE_FAVORITES_TASK';
 
-export const getFavorites = (skip: number = 0, limit: number = 20): IActionGenerator => {
-    const getFavoritesUrl = getBase() + '/v1' + URLS.FAVORITES_URL;
+export const getFavorites = (skip: number = 0, limit: number = 20, append: boolean = false): IActionGenerator => {
+    const successType = append ? APPEND_FAVORITES_SUCCESS : GET_FAVORITES_SUCCESS;
+    
+    // Construct URL with query parameters (like getBooksAction)
+    const queryParams = new URLSearchParams();
+    queryParams.append('skip', skip.toString());
+    queryParams.append('limit', limit.toString());
+    
+    const getFavoritesUrl = getBase() + '/v1' + URLS.FAVORITES_URL + `?${queryParams.toString()}`;
+    
+    console.log('getFavorites action created:', {
+        url: getFavoritesUrl,
+        skip,
+        limit,
+        append,
+        successType
+    });
+    
     return {
         [CALL_API]: {
             types: [
                 GET_FAVORITES_REQUEST,
-                GET_FAVORITES_SUCCESS,
+                successType,
                 GET_FAVORITES_FAILURE,
             ],
             url: getFavoritesUrl,
             method: HttpMethod.GET,
-            data: { skip, limit },
         },
         actionData: {
             errorMessage: 'Fetch Favorites Failed',
@@ -29,8 +45,13 @@ export const getFavorites = (skip: number = 0, limit: number = 20): IActionGener
     };
 };
 
-export const getFavoritesAction = (skip: number = 0, limit: number = 20): IActionGenerator => {
-    return getFavorites(skip, limit);
+export const getFavoritesAction = (skip: number = 0, limit: number = 20, append: boolean = false): IActionGenerator => {
+    return getFavorites(skip, limit, append);
+};
+
+// Keep backward compatibility for existing code
+export const getFavoritesActionSimple = (skip: number = 0, limit: number = 20): IActionGenerator => {
+    return getFavorites(skip, limit, false);
 };
 
 export const updateFavoritesTask: any = (favorites: any) => {

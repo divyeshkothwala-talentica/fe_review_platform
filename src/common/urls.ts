@@ -12,6 +12,7 @@ export const URLS = {
   REVIEWS_URL: '/reviews',
   BOOK_REVIEWS_URL: '/reviews/book/{bookId}',
   USER_REVIEWS_URL: '/reviews/user/{userId}',
+  CHECK_USER_REVIEW_URL: '/reviews/check/{bookId}',
   
   // Favorites URLs
   FAVORITES_URL: '/favorites',
