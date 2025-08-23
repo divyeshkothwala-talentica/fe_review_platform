@@ -15,6 +15,8 @@ export const URLS = {
   
   // Favorites URLs
   FAVORITES_URL: '/favorites',
+  FAVORITE_CHECK_URL: '/favorites/check/{bookId}',
+  FAVORITE_REMOVE_URL: '/favorites/{bookId}',
   
   // User URLs
   USER_PROFILE_URL: '/users/profile',

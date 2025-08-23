@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { getBooksAction } from '../../store/actions/getBooksActions';
 import { searchBooksAction, clearSearchResults } from '../../store/actions/searchBooksActions';
+import { addFavoriteAction } from '../../store/actions/addFavoriteActions';
+import { removeFavoriteAction } from '../../store/actions/removeFavoriteActions';
+import { checkFavoriteAction, updateFavoriteStatus } from '../../store/actions/checkFavoriteActions';
+
 import SearchBar from './SearchBar';
 import BookGrid from './BookGrid';
 import Pagination from './Pagination';
@@ -11,11 +15,16 @@ const BookListing: React.FC = () => {
   const authState = useAppSelector((state) => state.auth);
   const booksState = useAppSelector((state) => state.books);
   const searchState = useAppSelector((state) => state.search);
+  const favoriteStatusState = useAppSelector((state) => state.favoriteStatus);
 
   // Component state for pagination and search
   const [, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [favoriteErrors, setFavoriteErrors] = useState<{[key: string]: string}>({});
+  
+  // Track which books we've already checked to prevent duplicate API calls
+  const checkedBooksRef = useRef<Set<string>>(new Set());
 
   const isAuthenticated = authState.data.isAuthenticated;
   const itemsPerPage = 12;
@@ -39,6 +48,28 @@ const BookListing: React.FC = () => {
       dispatch(getBooksAction({ page: 1, limit: itemsPerPage }) as any);
     }
   }, [dispatch, isSearching, booksState.data.books.length]);
+
+  // Check favorite status for loaded books (only for authenticated users)
+  useEffect(() => {
+    // Only check favorites if user is properly authenticated with a valid token
+    if (isAuthenticated && authState.data.token && authState.data.user && books.length > 0) {
+      books.forEach((book: any) => {
+        // Only check if we haven't already made a request for this book
+        if (!checkedBooksRef.current.has(book._id)) {
+          // Mark as checked to prevent duplicate requests
+          checkedBooksRef.current.add(book._id);
+          dispatch(checkFavoriteAction(book._id) as any);
+        }
+      });
+    }
+  }, [isAuthenticated, authState.data.token, authState.data.user, books, dispatch]);
+
+  // Clear checked books when user logs out
+  useEffect(() => {
+    if (!isAuthenticated) {
+      checkedBooksRef.current.clear();
+    }
+  }, [isAuthenticated]);
 
   // Handle search
   const handleSearch = useCallback((term: string) => {
@@ -84,11 +115,65 @@ const BookListing: React.FC = () => {
     console.log('Book clicked:', bookId);
   }, []);
 
-  // Handle favorite toggle (for future favorites functionality)
+  // Handle favorite toggle with optimistic updates
   const handleFavoriteToggle = useCallback((bookId: string) => {
-    // TODO: Implement favorites functionality
-    console.log('Favorite toggled:', bookId);
-  }, []);
+    if (!isAuthenticated) return;
+
+    const currentStatus = favoriteStatusState.favoriteStatuses?.[bookId] || false;
+    const newStatus = !currentStatus;
+
+    // Clear any previous errors for this book
+    setFavoriteErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[bookId];
+      return newErrors;
+    });
+
+    // Optimistic update
+    dispatch(updateFavoriteStatus(bookId, newStatus));
+
+    // Make API call
+    const action = newStatus ? addFavoriteAction(bookId) : removeFavoriteAction(bookId);
+    dispatch(action as any)
+      .then((result: any) => {
+        // API call succeeded, the optimistic update was correct
+        if (result.error) {
+          // Revert optimistic update on error
+          dispatch(updateFavoriteStatus(bookId, currentStatus));
+          
+          // Handle different error types
+          const errorCode = result.error.errorStatusCode;
+          let errorMessage = newStatus ? 'Failed to add to favorites' : 'Failed to remove from favorites';
+          
+          if (errorCode === 'MISSING_TOKEN' || errorCode === 'INVALID_TOKEN') {
+            errorMessage = 'Please log in to manage favorites';
+          } else if (errorCode === 'NETWORK_ERROR') {
+            errorMessage = 'Network error. Please try again.';
+          }
+          
+          setFavoriteErrors(prev => ({
+            ...prev,
+            [bookId]: errorMessage
+          }));
+        }
+      })
+      .catch((error: any) => {
+        // Revert optimistic update on error
+        dispatch(updateFavoriteStatus(bookId, currentStatus));
+        
+        let errorMessage = newStatus ? 'Failed to add to favorites' : 'Failed to remove from favorites';
+        
+        // Handle 401 specifically
+        if (error.error?.code === 'MISSING_TOKEN' || error.error?.code === 'INVALID_TOKEN') {
+          errorMessage = 'Please log in to manage favorites';
+        }
+        
+        setFavoriteErrors(prev => ({
+          ...prev,
+          [bookId]: errorMessage
+        }));
+      });
+  }, [isAuthenticated, favoriteStatusState.favoriteStatuses, dispatch]);
 
   // Show no results when search has been performed but no results found
   const showNoResults = isSearching && 
@@ -144,6 +229,29 @@ const BookListing: React.FC = () => {
           </div>
         )}
 
+        {/* Favorite Errors */}
+        {Object.keys(favoriteErrors).length > 0 && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">
+                  Favorites Error
+                </h3>
+                <div className="mt-2 text-sm text-red-700">
+                  {Object.values(favoriteErrors).map((error, index) => (
+                    <p key={index}>{error}</p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Search Results Info */}
         {isSearching && searchState.data.hasSearched && !loading && (
           <div className="mb-6">
@@ -163,7 +271,9 @@ const BookListing: React.FC = () => {
           loading={loading}
           onBookClick={handleBookClick}
           onFavoriteToggle={handleFavoriteToggle}
-          favoriteBookIds={[]} // TODO: Get from favorites state
+          favoriteBookIds={Object.keys(favoriteStatusState.favoriteStatuses || {}).filter(
+            bookId => favoriteStatusState.favoriteStatuses?.[bookId]
+          )}
           showNoResults={showNoResults}
           searchTerm={searchTerm}
         />
