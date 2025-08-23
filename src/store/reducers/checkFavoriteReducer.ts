@@ -25,10 +25,10 @@ const checkFavoriteReducer: getReducerType = (
 
         case CHECK_FAVORITE_SUCCESS:
             const bookId = action.actionData?.bookId;
-            const isFavorite = action.response.data.data?.isFavorite;
+            const isFavorite = action.response.data?.isFavorite;
             return Object.assign({}, state, {
                 loading: false,
-                data: action.response.data.data,
+                data: action.response.data, // Fixed: was action.response.data.data
                 favoriteStatuses: {
                     ...state.favoriteStatuses,
                     [bookId]: isFavorite,

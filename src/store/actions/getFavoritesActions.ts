@@ -14,16 +14,19 @@ export const UPDATE_FAVORITES_TASK = 'UPDATE_FAVORITES_TASK';
 export const getFavorites = (skip: number = 0, limit: number = 20, append: boolean = false): IActionGenerator => {
     const successType = append ? APPEND_FAVORITES_SUCCESS : GET_FAVORITES_SUCCESS;
     
-    // Construct URL with query parameters (like getBooksAction)
+    // Convert skip to page number (backend expects page-based pagination)
+    const page = Math.floor(skip / limit) + 1;
+    
+    // Construct URL with query parameters
     const queryParams = new URLSearchParams();
-    queryParams.append('skip', skip.toString());
+    queryParams.append('page', page.toString());
     queryParams.append('limit', limit.toString());
     
     const getFavoritesUrl = getBase() + '/v1' + URLS.FAVORITES_URL + `?${queryParams.toString()}`;
     
     console.log('getFavorites action created:', {
         url: getFavoritesUrl,
-        skip,
+        page,
         limit,
         append,
         successType

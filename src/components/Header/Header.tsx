@@ -5,9 +5,12 @@ import { logoutUser } from '../../store/actions/authActions';
 interface HeaderProps {
   onSignInClick: () => void;
   onSignUpClick: () => void;
+  onProfileClick: () => void;
+  onHomeClick: () => void;
+  currentPage: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick }) => {
+const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick, onProfileClick, onHomeClick, currentPage }) => {
   const dispatch = useAppDispatch();
   const authState = useAppSelector((state) => state.auth);
   const { isAuthenticated, user } = authState.data;
@@ -24,40 +27,37 @@ const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick }) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-primary-600">
+            <button 
+              onClick={onHomeClick}
+              className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-colors"
+            >
               BookNest
-            </h1>
+            </button>
           </div>
 
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <a 
-              href="/" 
-              className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium"
+            <button 
+              onClick={onHomeClick}
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                currentPage === 'home' 
+                  ? 'text-primary-600 border-b-2 border-primary-600' 
+                  : 'text-gray-700 hover:text-primary-600'
+              }`}
             >
               Home
-            </a>
-            <a 
-              href="/books" 
-              className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium"
-            >
-              Books
-            </a>
+            </button>
             {isAuthenticated && (
-              <>
-                <a 
-                  href="/favorites" 
-                  className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium"
-                >
-                  Favorites
-                </a>
-                <a 
-                  href="/profile" 
-                  className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium"
-                >
-                  Profile
-                </a>
-              </>
+              <button 
+                onClick={onProfileClick}
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  currentPage === 'profile' 
+                    ? 'text-primary-600 border-b-2 border-primary-600' 
+                    : 'text-gray-700 hover:text-primary-600'
+                }`}
+              >
+                Profile
+              </button>
             )}
           </nav>
 
@@ -65,9 +65,20 @@ const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick }) => {
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-700">
-                  Welcome, {user?.name}
-                </span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-700">
+                    Welcome, {user?.name || user?.email}
+                  </span>
+                  <button
+                    onClick={onProfileClick}
+                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                    title="View Profile"
+                  >
+                    <svg className="w-5 h-5 text-gray-600 hover:text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
                 <button
                   onClick={handleLogout}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
