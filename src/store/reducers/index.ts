@@ -13,6 +13,8 @@ import createReviewReducer from './createReviewReducer';
 import updateReviewReducer from './updateReviewReducer';
 import deleteReviewReducer from './deleteReviewReducer';
 import checkUserReviewReducer from './checkUserReviewReducer';
+import updateUserProfileReducer from './updateUserProfileReducer';
+import getUserReviewsReducer from './getUserReviewsReducer';
 
 export const reducerObject = {
     auth: authReducer,
@@ -28,6 +30,8 @@ export const reducerObject = {
     updateReview: updateReviewReducer,
     deleteReview: deleteReviewReducer,
     userReviewStatus: checkUserReviewReducer,
+    updateUserProfile: updateUserProfileReducer,
+    userReviews: getUserReviewsReducer,
 };
 
 const rootReducer = combineReducers(reducerObject);
