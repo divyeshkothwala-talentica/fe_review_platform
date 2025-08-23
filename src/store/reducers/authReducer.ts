@@ -44,6 +44,10 @@ const authReducer: getReducerType = (
 
         case LOGIN_SUCCESS:
         case REGISTER_SUCCESS:
+            // Store token and user in localStorage for API service
+            localStorage.setItem('authToken', action.response.data.token);
+            localStorage.setItem('user', JSON.stringify(action.response.data.user));
+            
             return Object.assign({}, state, {
                 loading: false,
                 error: false,
@@ -72,6 +76,10 @@ const authReducer: getReducerType = (
             });
             
         case LOGOUT:
+            // Clear localStorage on logout
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            
             return Object.assign({}, state, {
                 loading: false,
                 error: false,
@@ -84,6 +92,14 @@ const authReducer: getReducerType = (
             });
             
         case SET_AUTH_DATA:
+            // Store token and user in localStorage for API service
+            if (action.response.token) {
+                localStorage.setItem('authToken', action.response.token);
+            }
+            if (action.response.user) {
+                localStorage.setItem('user', JSON.stringify(action.response.user));
+            }
+            
             return Object.assign({}, state, {
                 loading: false,
                 error: false,

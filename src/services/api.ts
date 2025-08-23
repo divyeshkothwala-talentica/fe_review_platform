@@ -41,10 +41,17 @@ class ApiService {
       },
       (error) => {
         if (error.response?.status === 401) {
-          // Token expired or invalid
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
-          window.location.href = '/';
+          // Only auto-logout for auth-related endpoints, not for other protected resources
+          const url = error.config?.url || '';
+          const isAuthEndpoint = url.includes('/auth/') || url.includes('/users/profile');
+          
+          if (isAuthEndpoint) {
+            // Token expired or invalid on auth endpoints
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/';
+          }
+          // For other endpoints (like favorites), let the component handle the error
         }
         return Promise.reject(error);
       }
@@ -64,19 +71,33 @@ class ApiService {
   // Method for full URL requests (used by middleware)
   public async getFullUrl<T>(fullUrl: string, params?: any): Promise<ApiResponse<T>> {
     try {
+      const token = localStorage.getItem('authToken');
+      const headers: any = {
+        'Content-Type': 'application/json',
+      };
+      
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+      
       // Use axios directly without the configured baseURL to avoid duplication
       const response = await axios.get(fullUrl, { 
         params,
         timeout: 10000,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(localStorage.getItem('authToken') && {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-          })
-        }
+        headers
       });
       return response.data;
     } catch (error: any) {
+      // Handle 401 errors more selectively for direct axios calls
+      if (error.response?.status === 401) {
+        const isAuthEndpoint = fullUrl.includes('/auth/') || fullUrl.includes('/users/profile');
+        
+        if (isAuthEndpoint) {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          window.location.href = '/';
+        }
+      }
       throw this.handleError(error);
     }
   }

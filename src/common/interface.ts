@@ -8,6 +8,7 @@ export interface IReducerAction {
   type: string;
   response?: any;
   error?: any;
+  actionData?: any;
 }
 
 export interface IApiCall {
