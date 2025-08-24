@@ -15,6 +15,7 @@ import deleteReviewReducer from './deleteReviewReducer';
 import checkUserReviewReducer from './checkUserReviewReducer';
 import updateUserProfileReducer from './updateUserProfileReducer';
 import getUserReviewsReducer from './getUserReviewsReducer';
+import getRecommendationsReducer from './getRecommendationsReducer';
 
 export const reducerObject = {
     auth: authReducer,
@@ -32,6 +33,7 @@ export const reducerObject = {
     userReviewStatus: checkUserReviewReducer,
     updateUserProfile: updateUserProfileReducer,
     userReviews: getUserReviewsReducer,
+    recommendations: getRecommendationsReducer,
 };
 
 const rootReducer = combineReducers(reducerObject);

@@ -4,22 +4,19 @@ import ProfileSettings from './ProfileSettings';
 import UserReviews from './UserReviews';
 import FavoriteBooks from './FavoriteBooks';
 
-interface UserProfileProps {
-  onBookClick?: (bookId: string) => void;
-}
+interface UserProfileProps {}
 
-const UserProfile: React.FC<UserProfileProps> = ({ onBookClick }) => {
+const UserProfile: React.FC<UserProfileProps> = () => {
   const authState = useAppSelector((state) => state.auth);
 
   const isAuthenticated = authState.data.isAuthenticated;
   const user = authState.data.user;
 
-  // Handle book click
+  // Handle book click - placeholder for future modal implementation
   const handleBookClick = useCallback((bookId: string) => {
-    if (onBookClick) {
-      onBookClick(bookId);
-    }
-  }, [onBookClick]);
+    console.log('Book clicked:', bookId);
+    // TODO: Implement book details modal
+  }, []);
 
   if (!isAuthenticated) {
     return (
