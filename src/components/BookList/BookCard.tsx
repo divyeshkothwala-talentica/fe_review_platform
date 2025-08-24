@@ -83,11 +83,11 @@ const BookCard: React.FC<BookCardProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Book Cover */}
-      <div className="relative h-64 bg-gray-200 flex items-center justify-center">
+      <div className="relative h-48 sm:h-64 bg-gray-200 flex items-center justify-center">
         {!imageLoaded && !imageError && (
           <div className="animate-pulse bg-gray-300 w-full h-full flex items-center justify-center">
             <svg
-              className="w-12 h-12 text-gray-400"
+              className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -103,7 +103,7 @@ const BookCard: React.FC<BookCardProps> = ({
         {imageError ? (
           <div className="w-full h-full bg-gray-300 flex items-center justify-center">
             <svg
-              className="w-12 h-12 text-gray-400"
+              className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -131,7 +131,7 @@ const BookCard: React.FC<BookCardProps> = ({
         {isAuthenticated && (
           <button
             onClick={handleFavoriteClick}
-            className="absolute top-2 right-2 p-2 rounded-full bg-white bg-opacity-80 hover:bg-opacity-100 transition-all duration-200"
+            className="absolute top-2 right-2 p-3 rounded-full bg-white bg-opacity-80 hover:bg-opacity-100 transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
             <svg
@@ -154,29 +154,29 @@ const BookCard: React.FC<BookCardProps> = ({
       </div>
 
       {/* Book Information */}
-      <div className="p-4">
-        <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-2">
+      <div className="p-3 sm:p-4">
+        <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-1 line-clamp-2">
           {book.title}
         </h3>
         
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-xs sm:text-sm text-gray-600 mb-2">
           by {book.author}
         </p>
         
-        <p className="text-sm text-gray-700 mb-3 line-clamp-3">
+        <p className="text-xs sm:text-sm text-gray-700 mb-3 line-clamp-3">
           {truncateDescription(book.description)}
         </p>
 
         {/* Rating and Reviews - Only for authenticated users */}
         {isAuthenticated && (
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 space-y-1 sm:space-y-0">
             <div className="flex items-center space-x-1">
               {renderStars(book.averageRating)}
-              <span className="text-sm text-gray-600 ml-1">
+              <span className="text-xs sm:text-sm text-gray-600 ml-1">
                 {book.averageRating.toFixed(1)}
               </span>
             </div>
-            <span className="text-sm text-gray-500">
+            <span className="text-xs sm:text-sm text-gray-500">
               ({book.totalReviews} review{book.totalReviews !== 1 ? 's' : ''})
             </span>
           </div>
@@ -186,7 +186,7 @@ const BookCard: React.FC<BookCardProps> = ({
         {isAuthenticated && (
           <button
             onClick={handleViewDetails}
-            className="w-full bg-gray-900 text-white py-2 px-4 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
+            className="w-full bg-gray-900 text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors duration-200 text-sm font-medium min-h-[44px] flex items-center justify-center"
           >
             View Details
           </button>
