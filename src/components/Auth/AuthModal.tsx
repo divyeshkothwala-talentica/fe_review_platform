@@ -34,7 +34,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
     }
   }, [authState.data.isAuthenticated, onClose]);
 
-  // Prevent modal from closing when there are authentication errors
+  // Handle modal close - allow explicit close but prevent accidental backdrop close with errors
   const handleModalClose = () => {
     // Only close if there's no authentication error or if user is authenticated
     if (!authState.error || authState.data.isAuthenticated) {
@@ -42,6 +42,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
     }
     // If there's an error, we could add a subtle shake animation or highlight
     // For now, we just prevent closing to keep the error visible
+  };
+
+  // Handle explicit close button click - always allow closing
+  const handleExplicitClose = () => {
+    setErrors({});
+    setFormData({ name: '', email: '', password: '' });
+    onClose();
   };
 
   useEffect(() => {
@@ -150,7 +157,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      handleModalClose();
+      handleExplicitClose();
     }
   };
 
@@ -169,7 +176,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
       >
         {/* Close button */}
         <button
-          onClick={handleModalClose}
+          onClick={handleExplicitClose}
           className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 text-xl font-bold p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
           aria-label="Close modal"
         >
