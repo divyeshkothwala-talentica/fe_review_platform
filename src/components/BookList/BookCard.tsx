@@ -16,12 +16,7 @@ const BookCard: React.FC<BookCardProps> = ({
   onFavoriteToggle,
   isFavorite = false,
 }) => {
-  // Debug what BookCard receives
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      console.log(`BookCard for "${book.title}" (${book._id}): isFavorite = ${isFavorite}`);
-    }
-  }, [isFavorite, isAuthenticated, book.title, book._id]);
+
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);

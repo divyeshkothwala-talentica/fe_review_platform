@@ -24,14 +24,6 @@ export const getFavorites = (skip: number = 0, limit: number = 20, append: boole
     
     const getFavoritesUrl = getBase() + '/v1' + URLS.FAVORITES_URL + `?${queryParams.toString()}`;
     
-    console.log('getFavorites action created:', {
-        url: getFavoritesUrl,
-        page,
-        limit,
-        append,
-        successType
-    });
-    
     return {
         [CALL_API]: {
             types: [

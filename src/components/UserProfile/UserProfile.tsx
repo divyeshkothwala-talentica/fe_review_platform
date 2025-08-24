@@ -14,7 +14,6 @@ const UserProfile: React.FC<UserProfileProps> = () => {
 
   // Handle book click - placeholder for future modal implementation
   const handleBookClick = useCallback((bookId: string) => {
-    console.log('Book clicked:', bookId);
     // TODO: Implement book details modal
   }, []);
 
