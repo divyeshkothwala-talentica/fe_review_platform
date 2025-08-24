@@ -171,6 +171,28 @@ export interface BookCardProps {
   isFavorite?: boolean;
 }
 
+// Recommendation types
+export interface Recommendation {
+  title: string;
+  author: string;
+  genre?: string;
+  reason: string;
+  confidence: number;
+  source: 'ai' | 'fallback';
+  averageRating?: number;
+  reviewCount?: number;
+}
+
+export interface RecommendationsState {
+  loading: boolean;
+  error: boolean;
+  errorDetails: any;
+  data: {
+    recommendations: Recommendation[];
+    source: 'ai' | 'fallback' | null;
+  };
+}
+
 export interface HeaderProps {
   user: User | null;
   isAuthenticated: boolean;

@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './hooks/redux';
 import { setAuthData } from './store/actions/authActions';
 import Header from './components/Header/Header';
 import AuthModal from './components/Auth/AuthModal';
-import BookListing from './components/BookList/BookListing';
-import UserProfile from './components/UserProfile/UserProfile';
+import applicationRoutes from './applicationRoutes';
 import authService from './services/authService';
 
-function App() {
+// Inner component that uses useLocation
+function AppContent() {
   const dispatch = useAppDispatch();
-  const authState = useAppSelector((state) => state.auth);
+  const location = useLocation();
   
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
-  const [currentPage, setCurrentPage] = useState<'home' | 'profile'>('home');
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for existing authentication on app load
@@ -45,17 +44,10 @@ function App() {
     setAuthModalMode(prev => prev === 'signin' ? 'signup' : 'signin');
   };
 
-  const handleNavigateToProfile = () => {
-    setCurrentPage('profile');
-  };
-
-  const handleNavigateToHome = () => {
-    setCurrentPage('home');
-  };
-
-  const handleBookClick = (bookId: string) => {
-    setSelectedBookId(bookId);
-    // TODO: Implement book details modal
+  const getCurrentPage = () => {
+    if (location.pathname === '/profile') return 'profile';
+    if (location.pathname === '/recommendations') return 'recommendations';
+    return 'home';
   };
 
   return (
@@ -63,19 +55,19 @@ function App() {
       <Header 
         onSignInClick={handleSignInClick}
         onSignUpClick={handleSignUpClick}
-        onProfileClick={handleNavigateToProfile}
-        onHomeClick={handleNavigateToHome}
-        currentPage={currentPage}
+        currentPage={getCurrentPage()}
       />
       
       <main>
-        {currentPage === 'home' ? (
-          <BookListing />
-        ) : currentPage === 'profile' ? (
-          <UserProfile onBookClick={handleBookClick} />
-        ) : (
-          <BookListing />
-        )}
+        <Routes>
+          {applicationRoutes.map((route, index) => (
+            <Route
+              key={index}
+              path={route.path}
+              element={<route.component />}
+            />
+          ))}
+        </Routes>
       </main>
 
       <AuthModal
@@ -85,6 +77,15 @@ function App() {
         onToggleMode={handleToggleMode}
       />
     </div>
+  );
+}
+
+// Main App component with Router wrapper
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

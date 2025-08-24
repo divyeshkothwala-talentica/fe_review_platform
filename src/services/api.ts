@@ -6,7 +6,7 @@ class ApiService {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+    this.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
     
     this.api = axios.create({
       baseURL: this.baseURL,
@@ -166,7 +166,7 @@ export const apiService = new ApiService();
 
 // Export getBase function for use in actions
 export const getBase = (): string => {
-  return process.env.REACT_APP_API_URL || 'http://localhost:5001';
+  return process.env.REACT_APP_API_URL || 'http://localhost:8000';
 };
 
 export default apiService;

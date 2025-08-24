@@ -250,6 +250,7 @@ const BookListing: React.FC = () => {
               onSearch={handleSearch}
               onClear={handleClearSearch}
               initialValue={searchTerm}
+              isAuthenticated={isAuthenticated}
             />
           </div>
         </div>

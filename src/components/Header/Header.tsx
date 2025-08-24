@@ -1,17 +1,17 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { logoutUser } from '../../store/actions/authActions';
 
 interface HeaderProps {
   onSignInClick: () => void;
   onSignUpClick: () => void;
-  onProfileClick: () => void;
-  onHomeClick: () => void;
   currentPage: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick, onProfileClick, onHomeClick, currentPage }) => {
+const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick, currentPage }) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const authState = useAppSelector((state) => state.auth);
   const { isAuthenticated, user } = authState.data;
 
@@ -19,6 +19,7 @@ const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick, onProfile
     dispatch(logoutUser());
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    navigate('/');
   };
 
   return (
@@ -27,18 +28,18 @@ const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick, onProfile
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <button 
-              onClick={onHomeClick}
+            <Link 
+              to="/"
               className="text-2xl font-bold text-primary-600 hover:text-primary-700 transition-colors"
             >
               BookNest
-            </button>
+            </Link>
           </div>
 
           {/* Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <button 
-              onClick={onHomeClick}
+            <Link 
+              to="/"
               className={`px-3 py-2 text-sm font-medium transition-colors ${
                 currentPage === 'home' 
                   ? 'text-primary-600 border-b-2 border-primary-600' 
@@ -46,10 +47,10 @@ const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick, onProfile
               }`}
             >
               Home
-            </button>
+            </Link>
             {isAuthenticated && (
-              <button 
-                onClick={onProfileClick}
+              <Link 
+                to="/profile"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
                   currentPage === 'profile' 
                     ? 'text-primary-600 border-b-2 border-primary-600' 
@@ -57,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick, onProfile
                 }`}
               >
                 Profile
-              </button>
+              </Link>
             )}
           </nav>
 
@@ -69,15 +70,15 @@ const Header: React.FC<HeaderProps> = ({ onSignInClick, onSignUpClick, onProfile
                   <span className="text-sm text-gray-700">
                     Welcome, {user?.name || user?.email}
                   </span>
-                  <button
-                    onClick={onProfileClick}
+                  <Link
+                    to="/profile"
                     className="p-1 rounded-full hover:bg-gray-100 transition-colors"
                     title="View Profile"
                   >
                     <svg className="w-5 h-5 text-gray-600 hover:text-primary-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
-                  </button>
+                  </Link>
                 </div>
                 <button
                   onClick={handleLogout}

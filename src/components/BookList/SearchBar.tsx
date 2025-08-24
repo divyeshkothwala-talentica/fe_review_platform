@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchBarProps {
   onSearch: (searchTerm: string) => void;
@@ -6,6 +7,7 @@ interface SearchBarProps {
   placeholder?: string;
   initialValue?: string;
   debounceMs?: number;
+  isAuthenticated?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -14,7 +16,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder = 'Search books, authors, or genres...',
   initialValue = '',
   debounceMs = 300,
+  isAuthenticated = false,
 }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState(initialValue);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(initialValue);
 
@@ -53,6 +57,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
+  const handleAIRecommendations = () => {
+    if (isAuthenticated) {
+      navigate('/recommendations');
+    }
+  };
+
   return (
     <div className="relative max-w-2xl mx-auto">
       <form onSubmit={handleSubmit} className="relative">
@@ -80,9 +90,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
             value={searchTerm}
             onChange={handleInputChange}
             placeholder={placeholder}
-            className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            className={`block w-full pl-10 ${isAuthenticated ? 'pr-20' : 'pr-12'} py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900`}
             aria-label="Search books"
           />
+
+          {/* AI Recommendations Button */}
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={handleAIRecommendations}
+              className="absolute inset-y-0 right-12 pr-2 flex items-center hover:text-blue-600 text-blue-500 transition-colors"
+              aria-label="Get AI Recommendations"
+              title="Get AI Recommendations"
+            >
+              <span className="text-lg">⚡</span>
+            </button>
+          )}
 
           {/* Clear Button */}
           {searchTerm && (
