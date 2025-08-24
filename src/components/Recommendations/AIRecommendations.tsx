@@ -14,8 +14,8 @@ const AIRecommendations: React.FC = () => {
   const { data: authData } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    // Fetch recommendations on component mount
-    if (authData.isAuthenticated) {
+    // Fetch recommendations on component mount - only when user is successfully authenticated
+    if (authData.isAuthenticated && authData.token && authData.user) {
       dispatch(getRecommendationsAction() as any);
     }
 
@@ -23,7 +23,7 @@ const AIRecommendations: React.FC = () => {
     return () => {
       dispatch(clearRecommendations());
     };
-  }, [dispatch, authData.isAuthenticated]);
+  }, [dispatch, authData.isAuthenticated, authData.token, authData.user]);
 
   const handleBackToBooks = () => {
     navigate('/');

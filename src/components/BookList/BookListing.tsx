@@ -34,6 +34,9 @@ const BookListing: React.FC = () => {
   
   // Track which books we've already checked to prevent duplicate API calls
   const checkedBooksRef = useRef<Set<string>>(new Set());
+  
+  // Track if we've already attempted to load initial books
+  const initialBooksLoadedRef = useRef<boolean>(false);
 
   const isAuthenticated = authState.data.isAuthenticated;
   const itemsPerPage = 12;
@@ -53,50 +56,35 @@ const BookListing: React.FC = () => {
 
   // Load initial books on component mount
   useEffect(() => {
-    if (!isSearching && booksState.data.books.length === 0) {
+    // Only load books once on component mount, and not during auth processes
+    if (!isSearching && 
+        booksState.data.books.length === 0 && 
+        !initialBooksLoadedRef.current &&
+        !authState.loading && 
+        !authState.error) {
+      initialBooksLoadedRef.current = true;
       dispatch(getBooksAction({ page: 1, limit: itemsPerPage }) as any);
     }
   }, [dispatch, isSearching, booksState.data.books.length]);
 
   // Fetch user favorites when user logs in (bulk fetch - more efficient)
   useEffect(() => {
-    console.log('Favorites fetch useEffect triggered:', {
-      isAuthenticated,
-      hasToken: !!authState.data.token,
-      hasUser: !!authState.data.user,
-      authState: authState.data
-    });
-    
-    if (isAuthenticated && authState.data.token && authState.data.user) {
-      console.log('Conditions met, dispatching getFavoritesAction...');
+    // Only fetch favorites when user is authenticated AND we have both token and user
+    // This prevents triggering on failed login attempts
+    if (isAuthenticated && authState.data.token && authState.data.user && !authState.error) {
       dispatch(getFavoritesAction(0, 50, false) as any);
-      console.log('getFavoritesAction dispatched');
-    } else {
-      console.log('Conditions NOT met for fetching favorites');
     }
-  }, [isAuthenticated, authState.data.token, authState.data.user, dispatch]);
+  }, [isAuthenticated, dispatch]); // Removed token and user from dependencies to prevent triggering on auth failures
 
   // Process fetched favorites and update heart icon states
   useEffect(() => {
-    console.log('Favorites processing useEffect triggered:', {
-      favoritesState: favoritesState,
-      hasFavoritesData: !!favoritesState.data,
-      favoritesArray: favoritesState.data?.favorites,
-      favoritesLength: favoritesState.data?.favorites?.length
-    });
-    
     if (favoritesState.data?.favorites && favoritesState.data.favorites.length > 0) {
-      console.log('Favorites fetched:', favoritesState.data.favorites);
-      
       // Update favorite status for each fetched favorite
       favoritesState.data.favorites.forEach((favorite: any) => {
         const bookId = favorite.bookId || favorite.book?._id || favorite._id;
-        console.log('Processing favorite:', favorite, 'extracted bookId:', bookId);
         
         if (bookId) {
-          console.log('About to dispatch updateFavoriteStatus for bookId:', bookId);
           dispatch(updateFavoriteStatus(bookId, true));
-          console.log('Dispatched updateFavoriteStatus for bookId:', bookId);
         }
       });
     }

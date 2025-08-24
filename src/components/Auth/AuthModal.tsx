@@ -20,6 +20,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+  // Clear errors and form when mode changes
+  useEffect(() => {
+    setErrors({});
+    setFormData({ name: '', email: '', password: '' });
+  }, [mode]);
+
   useEffect(() => {
     if (authState.data.isAuthenticated) {
       onClose();
@@ -28,11 +34,56 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
     }
   }, [authState.data.isAuthenticated, onClose]);
 
+  // Prevent modal from closing when there are authentication errors
+  const handleModalClose = () => {
+    // Only close if there's no authentication error or if user is authenticated
+    if (!authState.error || authState.data.isAuthenticated) {
+      onClose();
+    }
+    // If there's an error, we could add a subtle shake animation or highlight
+    // For now, we just prevent closing to keep the error visible
+  };
+
   useEffect(() => {
     if (authState.error && authState.errorDetails) {
+      // Extract more specific error message from server response
+      let errorMessage = authState.errorDetails.errorMessage || 'An error occurred';
+      
+      // Handle specific error cases
+      if (authState.errorDetails.message) {
+        errorMessage = authState.errorDetails.message;
+      } else if (authState.errorDetails.error) {
+        errorMessage = authState.errorDetails.error;
+      }
+      
+      // Handle common authentication errors with user-friendly messages
+      if (authState.errorDetails.errorStatusCode === 401 || 
+          errorMessage.toLowerCase().includes('unauthorized') ||
+          errorMessage.toLowerCase().includes('invalid credentials') || 
+          errorMessage.toLowerCase().includes('invalid email or password')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+      } else if (errorMessage.toLowerCase().includes('user already exists') || 
+                 errorMessage.toLowerCase().includes('email already registered')) {
+        errorMessage = 'An account with this email already exists. Please sign in instead.';
+      } else if (errorMessage.toLowerCase().includes('user not found')) {
+        errorMessage = 'No account found with this email. Please check your email or sign up.';
+      } else if (errorMessage.toLowerCase().includes('network') || 
+                 errorMessage.toLowerCase().includes('connection')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (errorMessage.toLowerCase().includes('server') || 
+                 authState.errorDetails.errorStatusCode >= 500) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+      
       setErrors({
-        general: authState.errorDetails.errorMessage || 'An error occurred',
+        general: errorMessage,
       });
+    } else {
+      // Clear general error when no auth error
+      setErrors(prev => ({
+        ...prev,
+        general: '',
+      }));
     }
   }, [authState.error, authState.errorDetails]);
 
@@ -43,11 +94,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
       [name]: value,
     }));
     
-    // Clear error when user starts typing
-    if (errors[name]) {
+    // Clear field-specific error and general error when user starts typing
+    if (errors[name] || errors.general) {
       setErrors(prev => ({
         ...prev,
         [name]: '',
+        general: '',
       }));
     }
   };
@@ -98,7 +150,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      onClose();
+      handleModalClose();
     }
   };
 
@@ -107,7 +159,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
+      onClick={handleModalClose}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
@@ -117,7 +169,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
       >
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleModalClose}
           className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 text-xl font-bold p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
           aria-label="Close modal"
         >
@@ -153,8 +205,49 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {errors.general && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded text-sm">
-              {errors.general}
+            <div 
+              className="bg-red-50 border border-red-200 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded text-sm flex items-start gap-2"
+              role="alert"
+              aria-live="polite"
+            >
+              <svg 
+                className="w-4 h-4 mt-0.5 flex-shrink-0" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
+              <span className="flex-1">{errors.general}</span>
+              <div className="flex gap-2 ml-2 flex-shrink-0">
+                {(errors.general.toLowerCase().includes('network') || 
+                  errors.general.toLowerCase().includes('server')) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setErrors(prev => ({ ...prev, general: '' }));
+                      handleSubmit(new Event('submit') as any);
+                    }}
+                    className="text-red-600 hover:text-red-800 text-xs underline"
+                  >
+                    Retry
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setErrors({});
+                    onClose(); // Use onClose directly here to force close
+                  }}
+                  className="text-red-600 hover:text-red-800 text-xs underline"
+                >
+                  Dismiss
+                </button>
+              </div>
             </div>
           )}
 
@@ -174,7 +267,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
                 }`}
                 placeholder="Enter your name"
               />
-              {errors.name && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-xs sm:text-sm mt-1 flex items-center gap-1" role="alert">
+                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.name}
+                </p>
+              )}
             </div>
           )}
 
@@ -193,7 +293,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
               }`}
               placeholder="Enter your email"
             />
-            {errors.email && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-xs sm:text-sm mt-1 flex items-center gap-1" role="alert">
+                <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {errors.email}
+              </p>
+            )}
           </div>
 
           <div>
@@ -211,7 +318,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
               }`}
               placeholder="Enter your password"
             />
-            {errors.password && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.password}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-xs sm:text-sm mt-1 flex items-center gap-1" role="alert">
+                <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {errors.password}
+              </p>
+            )}
           </div>
 
           <button

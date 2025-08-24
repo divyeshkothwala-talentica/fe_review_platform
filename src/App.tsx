@@ -11,6 +11,7 @@ import authService from './services/authService';
 function AppContent() {
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const authState = useAppSelector((state) => state.auth);
   
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
@@ -26,6 +27,13 @@ function AppContent() {
     }
   }, [dispatch]);
 
+  // Close modal when authentication is successful
+  useEffect(() => {
+    if (authState.data.isAuthenticated && isAuthModalOpen) {
+      setIsAuthModalOpen(false);
+    }
+  }, [authState.data.isAuthenticated, isAuthModalOpen]);
+
   const handleSignInClick = () => {
     setAuthModalMode('signin');
     setIsAuthModalOpen(true);
@@ -37,6 +45,10 @@ function AppContent() {
   };
 
   const handleCloseModal = () => {
+    // Don't close modal if there's an authentication error (unless user is authenticated)
+    if (authState.error && !authState.data.isAuthenticated) {
+      return;
+    }
     setIsAuthModalOpen(false);
   };
 

@@ -25,10 +25,11 @@ const FavoriteBooks: React.FC<FavoriteBooksProps> = ({ onBookClick }) => {
 
   // Load user favorites on component mount
   useEffect(() => {
-    if (isAuthenticated) {
+    // Only fetch favorites when user is authenticated AND we have valid auth state (not during auth errors)
+    if (isAuthenticated && authState.data.token && authState.data.user && !authState.error) {
       dispatch(getFavoritesAction(skip, limit) as any);
     }
-  }, [dispatch, isAuthenticated, skip, limit]);
+  }, [dispatch, isAuthenticated, skip, limit, authState.data.token, authState.data.user, authState.error]);
 
   // Handle remove from favorites
   const handleRemoveFavorite = useCallback((bookId: string) => {
