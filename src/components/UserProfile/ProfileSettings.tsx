@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { updateUserProfileAction } from '../../store/actions/updateUserProfileActions';
-import { SET_AUTH_DATA } from '../../store/actions/authActions';
+import { setAuthData } from '../../store/actions/authActions';
 
 interface ProfileSettingsProps {
   user: any;
@@ -17,6 +17,14 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user }) => {
     name: user?.name || '',
   });
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+
+  // Update form data when user prop changes (after successful profile update)
+  useEffect(() => {
+    setFormData({
+      email: user?.email || '',
+      name: user?.name || '',
+    });
+  }, [user]);
 
   const validateForm = () => {
     const errors: {[key: string]: string} = {};
@@ -66,13 +74,10 @@ const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user }) => {
         setFormErrors({ general: 'Failed to update profile' });
       } else {
         // Update auth state with new user data
-        dispatch({
-          type: SET_AUTH_DATA,
-          response: {
-            user: result.response.data.data,
-            token: localStorage.getItem('authToken'),
-          }
-        });
+        dispatch(setAuthData({
+          user: result.response.data.profile, // Fixed: use .profile instead of .data
+          token: localStorage.getItem('authToken'),
+        }));
         
         setIsEditing(false);
         setFormErrors({});

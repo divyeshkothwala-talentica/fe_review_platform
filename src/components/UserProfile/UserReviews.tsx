@@ -16,7 +16,7 @@ const UserReviews: React.FC<UserReviewsProps> = ({ userId, onBookClick }) => {
   const [limit] = useState(10);
 
   const reviews = userReviewsState.data?.reviews || [];
-  const totalReviews = userReviewsState.data?.pagination?.totalReviews || userReviewsState.data?.total || 0;
+  const totalReviews = userReviewsState.meta?.pagination?.totalReviews || userReviewsState.data?.pagination?.totalReviews || userReviewsState.data?.total || 0;
   const loading = userReviewsState.loading;
 
 
@@ -92,7 +92,7 @@ const UserReviews: React.FC<UserReviewsProps> = ({ userId, onBookClick }) => {
           <div>
             {reviews.map((review: any) => (
               <ReviewItem
-                key={review._id}
+                key={review.id || review._id}
                 review={review}
                 userId={userId}
                 skip={skip}

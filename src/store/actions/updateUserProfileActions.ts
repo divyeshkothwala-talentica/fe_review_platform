@@ -9,7 +9,8 @@ export const UPDATE_USER_PROFILE_SUCCESS = 'UPDATE_USER_PROFILE_SUCCESS';
 export const UPDATE_USER_PROFILE_FAILURE = 'UPDATE_USER_PROFILE_FAILURE';
 
 export const updateUserProfile = (profileData: { email?: string; name?: string }): IActionGenerator => {
-    const updateUserProfileUrl = getBase() + URLS.USER_PROFILE_URL;
+    // Use just the endpoint - the apiService.put method will add /v1 prefix
+    const updateUserProfileUrl = URLS.USER_PROFILE_URL;
     return {
         [CALL_API]: {
             types: [

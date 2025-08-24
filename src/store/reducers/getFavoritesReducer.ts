@@ -24,11 +24,10 @@ const getFavoritesReducer: getReducerType = (
             });
 
         case GET_FAVORITES_SUCCESS:
-            console.log('GET_FAVORITES_SUCCESS received:', action.response);
-            console.log('Extracting data from response:', action.response.data);
             return Object.assign({}, state, {
                 loading: false,
                 data: action.response.data, // Changed from action.response.data.data
+                meta: action.response.meta, // Store meta information including pagination
             });
         case APPEND_FAVORITES_SUCCESS:
             const existingFavorites = state.data?.favorites || [];
@@ -39,6 +38,7 @@ const getFavoritesReducer: getReducerType = (
                     ...action.response.data,
                     favorites: [...existingFavorites, ...newFavorites],
                 },
+                meta: action.response.meta, // Store meta information including pagination
             });
         case GET_FAVORITES_FAILURE:
             console.log('GET_FAVORITES_FAILURE received:', action.error);
