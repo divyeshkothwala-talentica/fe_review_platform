@@ -5,6 +5,7 @@ import {
   GET_BOOKS_REQUEST,
   GET_BOOKS_SUCCESS,
   UPDATE_BOOKS_TASK,
+  UPDATE_BOOK_IN_LIST,
 } from '../actions/getBooksActions';
 
 const getBooksReducer: getReducerType = (
@@ -80,6 +81,17 @@ const getBooksReducer: getReducerType = (
       return Object.assign({}, state, {
         loading: false,
         data: { ...updatedData },
+      });
+      
+    case UPDATE_BOOK_IN_LIST:
+      const updatedBooks = state.data.books.map((book: any) => 
+        book._id === (action as any).book._id ? (action as any).book : book
+      );
+      return Object.assign({}, state, {
+        data: {
+          ...state.data,
+          books: updatedBooks,
+        },
       });
   }
   return state;

@@ -6,6 +6,7 @@ import {
   SEARCH_BOOKS_SUCCESS,
   CLEAR_SEARCH_RESULTS,
 } from '../actions/searchBooksActions';
+import { UPDATE_BOOK_IN_LIST } from '../actions/getBooksActions';
 
 const searchBooksReducer: getReducerType = (
   state,
@@ -93,6 +94,17 @@ const searchBooksReducer: getReducerType = (
             hasPrevPage: false,
           },
           hasSearched: false,
+        },
+      });
+      
+    case UPDATE_BOOK_IN_LIST:
+      const updatedSearchResults = state.data.searchResults.map((book: any) => 
+        book._id === (action as any).book._id ? (action as any).book : book
+      );
+      return Object.assign({}, state, {
+        data: {
+          ...state.data,
+          searchResults: updatedSearchResults,
         },
       });
   }

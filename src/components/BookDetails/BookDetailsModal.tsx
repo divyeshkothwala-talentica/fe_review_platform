@@ -7,6 +7,7 @@ import ReviewsList from './ReviewsList';
 import { getBookReviewsAction } from '../../store/actions/getBookReviewsActions';
 import { checkUserReviewAction } from '../../store/actions/checkUserReviewActions';
 import { getBookAction } from '../../store/actions/getBookActions';
+import { updateBookInList } from '../../store/actions/getBooksActions';
 
 interface BookDetailsModalProps {
   book: Book;
@@ -99,6 +100,14 @@ const BookDetailsModal: React.FC<BookDetailsModalProps> = ({
     dispatch(checkUserReviewAction(book._id) as any);
     dispatch(getBookAction(book._id) as any);
   };
+
+  // Update book in list when book data changes after review submission
+  useEffect(() => {
+    if (bookData?.data?._id === book._id && bookData.data) {
+      // Update the book in the books list with the latest data
+      dispatch(updateBookInList(bookData.data));
+    }
+  }, [bookData?.data, book._id, dispatch]);
 
   if (!isOpen || !book) {
     return null;
