@@ -106,30 +106,30 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
     >
       <div 
-        className="bg-white rounded-lg p-8 w-full max-w-md mx-4 relative"
+        className="bg-white rounded-lg p-6 sm:p-8 w-full max-w-md mx-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl font-bold"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 text-xl font-bold p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
           aria-label="Close modal"
         >
           ×
         </button>
 
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <div className="flex border-b">
             <button
               onClick={() => mode !== 'signin' && onToggleMode()}
-              className={`flex-1 py-2 px-4 text-center font-medium ${
+              className={`flex-1 py-3 px-3 sm:px-4 text-center font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center ${
                 mode === 'signin'
                   ? 'text-primary-600 border-b-2 border-primary-600'
                   : 'text-gray-500 hover:text-gray-700'
@@ -139,7 +139,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
             </button>
             <button
               onClick={() => mode !== 'signup' && onToggleMode()}
-              className={`flex-1 py-2 px-4 text-center font-medium ${
+              className={`flex-1 py-3 px-3 sm:px-4 text-center font-medium text-sm sm:text-base min-h-[44px] flex items-center justify-center ${
                 mode === 'signup'
                   ? 'text-primary-600 border-b-2 border-primary-600'
                   : 'text-gray-500 hover:text-gray-700'
@@ -151,9 +151,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {errors.general && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded text-sm">
               {errors.general}
             </div>
           )}
@@ -169,12 +169,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                className={`w-full px-3 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base min-h-[44px] ${
                   errors.name ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="Enter your name"
               />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.name}</p>}
             </div>
           )}
 
@@ -188,12 +188,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+              className={`w-full px-3 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base min-h-[44px] ${
                 errors.email ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter your email"
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.email}</p>}
           </div>
 
           <div>
@@ -206,18 +206,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode, onClose, onToggleMo
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+              className={`w-full px-3 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base min-h-[44px] ${
                 errors.password ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter your password"
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+            {errors.password && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.password}</p>}
           </div>
 
           <button
             type="submit"
             disabled={authState.loading}
-            className="w-full bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-primary-600 text-white py-3 px-4 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium min-h-[44px] flex items-center justify-center"
           >
             {authState.loading ? 'Loading...' : mode === 'signup' ? 'Create Account' : 'Sign In'}
           </button>

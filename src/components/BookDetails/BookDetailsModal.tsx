@@ -127,13 +127,13 @@ const BookDetailsModal: React.FC<BookDetailsModalProps> = ({
         tabIndex={-1}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 id="modal-title" className="text-xl font-semibold text-gray-900 truncate pr-4">
+        <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200">
+          <h2 id="modal-title" className="text-lg sm:text-xl font-semibold text-gray-900 truncate pr-4">
             {currentBook.title}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-3 hover:bg-gray-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Close modal"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,13 +143,13 @@ const BookDetailsModal: React.FC<BookDetailsModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] sm:max-h-[calc(90vh-80px)] overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-[calc(100vh-68px)] sm:h-[calc(100vh-80px)] sm:max-h-[calc(90vh-80px)] overflow-hidden">
           {/* Left side - Book cover */}
-          <div className="lg:w-1/3 p-4 sm:p-6 flex justify-center items-start bg-gray-50 flex-shrink-0">
-            <div className="w-full max-w-[200px] lg:max-w-xs">
+          <div className="lg:w-1/3 p-3 sm:p-4 lg:p-6 flex justify-center items-start bg-gray-50 flex-shrink-0">
+            <div className="w-full max-w-[150px] sm:max-w-[200px] lg:max-w-xs">
               {!imageLoaded && !imageError && (
                 <div className="aspect-[3/4] bg-gray-300 animate-pulse rounded-lg flex items-center justify-center">
-                  <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                   </svg>
                 </div>
@@ -157,7 +157,7 @@ const BookDetailsModal: React.FC<BookDetailsModalProps> = ({
               
               {imageError ? (
                 <div className="aspect-[3/4] bg-gray-300 rounded-lg flex items-center justify-center">
-                  <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                   </svg>
                 </div>
@@ -177,13 +177,13 @@ const BookDetailsModal: React.FC<BookDetailsModalProps> = ({
 
           {/* Right side - Book info and reviews */}
           <div className="lg:w-2/3 flex flex-col overflow-hidden">
-            <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+            <div className="p-3 sm:p-4 lg:p-6 overflow-y-auto flex-1">
               {/* Book Information */}
               <div className="mb-4 sm:mb-6">
-                <p className="text-base sm:text-lg text-gray-700 mb-2">
+                <p className="text-sm sm:text-base lg:text-lg text-gray-700 mb-2">
                   <span className="font-medium">Author:</span> {currentBook.author}
                 </p>
-                <p className="text-base sm:text-lg text-gray-700 mb-2">
+                <p className="text-sm sm:text-base lg:text-lg text-gray-700 mb-2">
                   <span className="font-medium">Published:</span> {currentBook.publishedYear}
                 </p>
                 <p className="text-sm sm:text-base text-gray-700 mb-4 leading-relaxed">
@@ -194,11 +194,11 @@ const BookDetailsModal: React.FC<BookDetailsModalProps> = ({
                 <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0 mb-4 sm:mb-6">
                   <div className="flex items-center space-x-2">
                     <StarRating rating={currentBook.averageRating} readonly size="md" />
-                    <span className="text-base sm:text-lg font-medium text-gray-900">
+                    <span className="text-sm sm:text-base lg:text-lg font-medium text-gray-900">
                       {currentBook.averageRating.toFixed(1)}
                     </span>
                   </div>
-                  <span className="text-sm sm:text-base text-gray-600">
+                  <span className="text-xs sm:text-sm lg:text-base text-gray-600">
                     ({currentBook.totalReviews} review{currentBook.totalReviews !== 1 ? 's' : ''})
                   </span>
                 </div>
@@ -218,7 +218,7 @@ const BookDetailsModal: React.FC<BookDetailsModalProps> = ({
 
               {/* Reviews List */}
               <div>
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
+                <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 mb-4">
                   Reviews ({currentBook.totalReviews})
                 </h3>
                 <ReviewsList
