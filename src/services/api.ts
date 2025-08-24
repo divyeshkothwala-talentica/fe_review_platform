@@ -41,15 +41,20 @@ class ApiService {
       },
       (error) => {
         if (error.response?.status === 401) {
-          // Only auto-logout for auth-related endpoints, not for other protected resources
           const url = error.config?.url || '';
           const isAuthEndpoint = url.includes('/auth/') || url.includes('/users/profile');
           
           if (isAuthEndpoint) {
-            // Token expired or invalid on auth endpoints
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            window.location.href = '/';
+            // For login/register attempts, don't redirect - let the component handle the error
+            const isLoginAttempt = url.includes('/auth/login') || url.includes('/auth/register');
+            
+            if (!isLoginAttempt) {
+              // Only auto-logout and redirect for other auth endpoints (like token validation)
+              localStorage.removeItem('authToken');
+              localStorage.removeItem('user');
+              window.location.href = '/';
+            }
+            // For login/register attempts, just let the error propagate to be handled by the component
           }
           // For other endpoints (like favorites), let the component handle the error
         }
