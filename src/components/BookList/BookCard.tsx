@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Book } from '../../types';
 
 interface BookCardProps {
@@ -16,7 +17,11 @@ const BookCard: React.FC<BookCardProps> = ({
   onFavoriteToggle,
   isFavorite = false,
 }) => {
-
+  // Get updated book data from Redux if available
+  const bookData = useSelector((state: any) => state.book);
+  
+  // Use updated book data if it matches this book's ID, otherwise use prop
+  const currentBook = bookData?.data?._id === book._id ? bookData.data : book;
 
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -32,14 +37,14 @@ const BookCard: React.FC<BookCardProps> = ({
 
   const handleViewDetails = () => {
     if (onBookClick) {
-      onBookClick(book._id);
+      onBookClick(currentBook._id);
     }
   };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onFavoriteToggle) {
-      onFavoriteToggle(book._id);
+      onFavoriteToggle(currentBook._id);
     }
   };
 
@@ -111,8 +116,8 @@ const BookCard: React.FC<BookCardProps> = ({
           </div>
         ) : (
           <img
-            src={book.coverImageUrl}
-            alt={book.title}
+            src={currentBook.coverImageUrl}
+            alt={currentBook.title}
             className={`w-full h-full object-cover transition-opacity duration-300 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
@@ -151,28 +156,28 @@ const BookCard: React.FC<BookCardProps> = ({
       {/* Book Information */}
       <div className="p-3 sm:p-4">
         <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-1 line-clamp-2">
-          {book.title}
+          {currentBook.title}
         </h3>
         
         <p className="text-xs sm:text-sm text-gray-600 mb-2">
-          by {book.author}
+          by {currentBook.author}
         </p>
         
         <p className="text-xs sm:text-sm text-gray-700 mb-3 line-clamp-3">
-          {truncateDescription(book.description)}
+          {truncateDescription(currentBook.description)}
         </p>
 
         {/* Rating and Reviews - Only for authenticated users */}
         {isAuthenticated && (
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 space-y-1 sm:space-y-0">
             <div className="flex items-center space-x-1">
-              {renderStars(book.averageRating)}
+              {renderStars(currentBook.averageRating)}
               <span className="text-xs sm:text-sm text-gray-600 ml-1">
-                {book.averageRating.toFixed(1)}
+                {currentBook.averageRating.toFixed(1)}
               </span>
             </div>
             <span className="text-xs sm:text-sm text-gray-500">
-              ({book.totalReviews} review{book.totalReviews !== 1 ? 's' : ''})
+              ({currentBook.totalReviews} review{currentBook.totalReviews !== 1 ? 's' : ''})
             </span>
           </div>
         )}

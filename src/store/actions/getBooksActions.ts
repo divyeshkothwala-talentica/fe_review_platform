@@ -9,6 +9,7 @@ export const GET_BOOKS_SUCCESS = 'GET_BOOKS_SUCCESS';
 export const GET_BOOKS_FAILURE = 'GET_BOOKS_FAILURE';
 
 export const UPDATE_BOOKS_TASK = 'UPDATE_BOOKS_TASK';
+export const UPDATE_BOOK_IN_LIST = 'UPDATE_BOOK_IN_LIST';
 
 export const getBooks = (params: {
   page?: number;
@@ -64,4 +65,8 @@ export const getBooksAction = (params: {
 
 export const updateBooksTask: any = (task: any) => {
   return { type: UPDATE_BOOKS_TASK, response: task };
+};
+
+export const updateBookInList: any = (book: any) => {
+  return { type: UPDATE_BOOK_IN_LIST, book };
 };
