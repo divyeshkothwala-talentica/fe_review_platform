@@ -42,7 +42,6 @@ export const checkFavoriteActionSafe = (bookId: string, isAuthenticated: boolean
 };
 
 export const updateFavoriteStatus: any = (bookId: string, isFavorite: boolean) => {
-    console.log('updateFavoriteStatus action dispatched:', { bookId, isFavorite });
     return { 
         type: UPDATE_FAVORITE_STATUS, 
         response: { bookId, isFavorite } 

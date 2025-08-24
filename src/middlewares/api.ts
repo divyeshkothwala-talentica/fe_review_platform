@@ -18,7 +18,6 @@ const apiMiddleware: Middleware = (store) => (next) => async (action: any) => {
   const state = store.getState();
   const authState = state.auth;
   if (url.includes('/books') && authState?.error && !authState?.data?.isAuthenticated) {
-    console.log('Blocking books API call due to auth error:', url);
     return; // Don't proceed with the API call
   }
 

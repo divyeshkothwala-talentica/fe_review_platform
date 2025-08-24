@@ -18,10 +18,7 @@ const BookListing: React.FC = () => {
   const booksState = useAppSelector((state) => state.books);
   const searchState = useAppSelector((state) => state.search);
   const favoriteStatusState = useAppSelector((state) => state.favoriteStatus);
-  const favoritesState = useAppSelector((state) => {
-    console.log('favoritesState selector called, state.favorites:', state.favorites);
-    return state.favorites;
-  });
+  const favoritesState = useAppSelector((state) => state.favorites);
 
   // Component state for pagination and search
   const [, setCurrentPage] = useState(1);
@@ -315,8 +312,6 @@ const BookListing: React.FC = () => {
             const favoriteIds = Object.keys(favoriteStatusState.favoriteStatuses || {}).filter(
               bookId => favoriteStatusState.favoriteStatuses?.[bookId]
             );
-            console.log('favoriteStatusState:', favoriteStatusState);
-            console.log('Passing favoriteBookIds to BookGrid:', favoriteIds);
             return favoriteIds;
           })()}
           showNoResults={showNoResults}

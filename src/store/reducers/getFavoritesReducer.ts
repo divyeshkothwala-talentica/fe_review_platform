@@ -17,7 +17,6 @@ const getFavoritesReducer: getReducerType = (
     }
     switch (action.type) {
         case GET_FAVORITES_REQUEST:
-            console.log('GET_FAVORITES_REQUEST received');
             return Object.assign({}, state, {
                 loading: true,
                 data: state.data || {},
@@ -41,7 +40,6 @@ const getFavoritesReducer: getReducerType = (
                 meta: action.response.meta, // Store meta information including pagination
             });
         case GET_FAVORITES_FAILURE:
-            console.log('GET_FAVORITES_FAILURE received:', action.error);
             return Object.assign({}, state, {
                 loading: false,
                 error: true,
