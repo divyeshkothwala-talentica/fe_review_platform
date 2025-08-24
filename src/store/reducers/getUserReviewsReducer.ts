@@ -24,6 +24,7 @@ const getUserReviewsReducer: getReducerType = (
             return Object.assign({}, state, {
                 loading: false,
                 data: action.response.data, // Fixed: was action.response.data.data
+                meta: action.response.meta, // Store meta information including pagination
             });
         case GET_USER_REVIEWS_FAILURE:
             return Object.assign({}, state, {

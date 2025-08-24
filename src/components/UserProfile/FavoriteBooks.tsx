@@ -20,7 +20,7 @@ const FavoriteBooks: React.FC<FavoriteBooksProps> = ({ onBookClick }) => {
 
   const isAuthenticated = authState.data.isAuthenticated;
   const favorites = favoritesState.data?.favorites || [];
-  const totalFavorites = favoritesState.data?.pagination?.totalItems || favoritesState.data?.total || 0;
+  const totalFavorites = favoritesState.meta?.pagination?.totalItems || favoritesState.data?.pagination?.totalItems || favoritesState.data?.total || 0;
   const loading = favoritesState.loading;
 
   // Load user favorites on component mount

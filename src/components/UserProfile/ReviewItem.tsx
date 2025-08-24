@@ -31,7 +31,8 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
   });
   const [reviewErrors, setReviewErrors] = useState<{[key: string]: string}>({});
 
-  const handleDeleteReview = useCallback(async (reviewId: string) => {
+  const handleDeleteReview = useCallback(async (review: any) => {
+    const reviewId = review.id || review._id;
     if (window.confirm('Are you sure you want to delete this review?')) {
       try {
         const result = await dispatch(deleteReviewAction(reviewId) as any);
@@ -46,7 +47,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
   }, [dispatch, userId, skip, limit]);
 
   const handleEditReview = useCallback((review: any) => {
-    setEditingReview(review._id);
+    setEditingReview(review.id || review._id);
     setEditFormData({
       rating: review.rating,
       comment: review.comment || review.text || '',
@@ -63,7 +64,8 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
     setReviewErrors({});
   }, []);
 
-  const handleUpdateReview = useCallback(async (reviewId: string) => {
+  const handleUpdateReview = useCallback(async (review: any) => {
+    const reviewId = review.id || review._id;
     if (!editFormData.rating || editFormData.rating < 1 || editFormData.rating > 5) {
       setReviewErrors({ rating: 'Please select a rating between 1 and 5 stars' });
       return;
@@ -108,7 +110,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
             {review.book?.title}
           </h3>
 
-          {editingReview === review._id ? (
+          {editingReview === (review.id || review._id) ? (
             // Edit form
             <div className="space-y-3">
               {reviewErrors.general && (
@@ -167,7 +169,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
 
               <div className="flex space-x-2">
                 <button
-                  onClick={() => handleUpdateReview(review._id)}
+                  onClick={() => handleUpdateReview(review)}
                   disabled={updateReviewState.loading}
                   className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                 >
@@ -198,7 +200,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDeleteReview(review._id)}
+                    onClick={() => handleDeleteReview(review)}
                     disabled={deleteReviewState.loading}
                     className="text-red-600 hover:text-red-800 disabled:opacity-50"
                   >
@@ -211,7 +213,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
         </div>
 
         {/* Star Rating - Right Side */}
-        {editingReview !== review._id && (
+        {editingReview !== (review.id || review._id) && (
           <div className="flex items-center space-x-1 ml-4">
             {Array.from({ length: 5 }).map((_, i) => (
               <span
