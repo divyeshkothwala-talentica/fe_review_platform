@@ -11,7 +11,7 @@ export const GET_RECOMMENDATIONS_FAILURE = 'GET_RECOMMENDATIONS_FAILURE';
 export const CLEAR_RECOMMENDATIONS = 'CLEAR_RECOMMENDATIONS';
 
 export const getRecommendations = (): IActionGenerator => {
-    const getRecommendationsUrl = getBase() + '/v1' + URLS.RECOMMENDATIONS_URL;
+    const getRecommendationsUrl = getBase() + '/api/v1' + URLS.RECOMMENDATIONS_URL;
     return {
         [CALL_API]: {
             types: [

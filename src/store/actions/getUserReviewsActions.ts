@@ -9,7 +9,7 @@ export const GET_USER_REVIEWS_SUCCESS = 'GET_USER_REVIEWS_SUCCESS';
 export const GET_USER_REVIEWS_FAILURE = 'GET_USER_REVIEWS_FAILURE';
 
 export const getUserReviews = (userId: string, skip: number = 0, limit: number = 20): IActionGenerator => {
-    let getUserReviewsUrl = getBase() + '/v1' + URLS.USER_REVIEWS_URL;
+    let getUserReviewsUrl = getBase() + '/api/v1' + URLS.USER_REVIEWS_URL;
     getUserReviewsUrl = getUserReviewsUrl.replace('{userId}', userId);
     
     // Convert skip to page number (backend expects page-based pagination)

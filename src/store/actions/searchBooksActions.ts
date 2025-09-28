@@ -28,7 +28,7 @@ export const searchBooks = (searchTerm: string, params: {
   queryParams.append('limit', limit.toString());
   queryParams.append('search', searchTerm.trim());
 
-  let searchBooksUrl = getBase() + '/v1' + URLS.BOOKS_URL;
+  let searchBooksUrl = getBase() + '/api/v1' + URLS.BOOKS_URL;
   searchBooksUrl += `?${queryParams.toString()}`;
 
   return {

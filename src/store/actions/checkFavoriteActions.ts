@@ -12,7 +12,7 @@ export const UPDATE_FAVORITE_STATUS = 'UPDATE_FAVORITE_STATUS';
 export const CLEAR_FAVORITE_STATUS = 'CLEAR_FAVORITE_STATUS';
 
 export const checkFavorite = (bookId: string): IActionGenerator => {
-    const checkFavoriteUrl = getBase() + '/v1' + URLS.FAVORITE_CHECK_URL.replace('{bookId}', bookId);
+    const checkFavoriteUrl = getBase() + '/api/v1' + URLS.FAVORITE_CHECK_URL.replace('{bookId}', bookId);
     return {
         [CALL_API]: {
             types: [

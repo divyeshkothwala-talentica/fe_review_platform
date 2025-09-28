@@ -33,7 +33,7 @@ export const getBooks = (params: {
     queryParams.append('search', search.trim());
   }
 
-  let getBooksUrl = getBase() + '/v1' + URLS.BOOKS_URL;
+  let getBooksUrl = getBase() + '/api/v1' + URLS.BOOKS_URL;
   if (queryParams.toString()) {
     getBooksUrl += `?${queryParams.toString()}`;
   }

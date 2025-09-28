@@ -9,7 +9,7 @@ export const GET_BOOK_REVIEWS_SUCCESS = 'GET_BOOK_REVIEWS_SUCCESS';
 export const GET_BOOK_REVIEWS_FAILURE = 'GET_BOOK_REVIEWS_FAILURE';
 
 export const getBookReviews = (bookId: string, skip: number = 0, limit: number = 10): IActionGenerator => {
-    let getBookReviewsUrl = getBase() + '/v1' + URLS.BOOK_REVIEWS_URL;
+    let getBookReviewsUrl = getBase() + '/api/v1' + URLS.BOOK_REVIEWS_URL;
     getBookReviewsUrl = getBookReviewsUrl.replace('{bookId}', bookId);
     getBookReviewsUrl += `?skip=${skip}&limit=${limit}`;
     
