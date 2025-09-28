@@ -34,6 +34,6 @@ output "github_actions_role_arn" {
 }
 
 output "backend_api_url" {
-  description = "Backend API URL for frontend configuration"
-  value       = var.backend_api_url
+  description = "Backend API URL for frontend configuration (direct to EC2)"
+  value       = "https://44.194.207.22"
 }

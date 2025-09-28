@@ -22,7 +22,7 @@ export const getFavorites = (skip: number = 0, limit: number = 20, append: boole
     queryParams.append('page', page.toString());
     queryParams.append('limit', limit.toString());
     
-    const getFavoritesUrl = getBase() + '/api/v1' + URLS.FAVORITES_URL + `?${queryParams.toString()}`;
+    const getFavoritesUrl = getBase() + '/v1' + URLS.FAVORITES_URL + `?${queryParams.toString()}`;
     
     return {
         [CALL_API]: {

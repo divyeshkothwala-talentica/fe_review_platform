@@ -9,7 +9,7 @@ export const GET_BOOK_SUCCESS = 'GET_BOOK_SUCCESS';
 export const GET_BOOK_FAILURE = 'GET_BOOK_FAILURE';
 
 export const getBook = (bookId: string): IActionGenerator => {
-    let getBookUrl = getBase() + '/api/v1' + URLS.BOOKS_URL + `/${bookId}`;
+    let getBookUrl = getBase() + '/v1' + URLS.BOOKS_URL + `/${bookId}`;
     return {
         [CALL_API]: {
             types: [

@@ -79,6 +79,7 @@ resource "aws_cloudfront_origin_access_control" "frontend_oac" {
 
 # CloudFront distribution
 resource "aws_cloudfront_distribution" "frontend_distribution" {
+  # S3 origin for static frontend files only
   origin {
     domain_name              = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
     origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac.id
@@ -87,7 +88,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "Frontend distribution for Review Platform"
+  comment             = "Frontend distribution for Review Platform - Updated for HTTP support"
   default_root_object = "index.html"
 
   # Custom error pages for SPA routing
@@ -103,12 +104,6 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     response_page_path = "/index.html"
   }
 
-  # Redirect HTTPS to HTTP for Mixed Content fix
-  custom_error_response {
-    error_code         = 400
-    response_code      = 301
-    response_page_path = "/redirect.html"
-  }
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -122,7 +117,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
       }
     }
 
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
@@ -148,7 +143,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     default_ttl            = 86400
     max_ttl                = 31536000
     compress               = true
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
   }
 
   price_class = var.cloudfront_price_class

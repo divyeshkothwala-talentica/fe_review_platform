@@ -26,22 +26,13 @@
     -->
     <title>Book Review Platform</title>
     
-    <!-- Auto-redirect HTTPS to HTTP to avoid Mixed Content issues -->
+    <!-- HTTPS Backend Support - No redirects needed -->
     <script>
       (function() {
-        // Only redirect once to prevent infinite loops
-        if (window.location.protocol === 'https:' && 
-            window.location.hostname.includes('cloudfront.net') && 
-            !sessionStorage.getItem('redirected')) {
-          sessionStorage.setItem('redirected', 'true');
-          const httpUrl = window.location.href.replace('https://', 'http://');
-          console.log('Redirecting from HTTPS to HTTP:', httpUrl);
-          window.location.replace(httpUrl);
-        } else if (window.location.protocol === 'http:') {
-          // Clear redirect flag when on HTTP
-          sessionStorage.removeItem('redirected');
-          console.log('On HTTP, API URL should be: http://43.205.211.216:5000');
-        }
+        // Log current protocol and backend configuration
+        console.log('🌐 Current URL:', window.location.href);
+        console.log('📡 Backend API:', 'https://44.194.207.22');
+        console.log('✅ HTTPS to HTTPS - No mixed content issues');
       })();
     </script>
   </head>

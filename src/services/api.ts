@@ -6,7 +6,7 @@ class ApiService {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = process.env.REACT_APP_API_URL || 'http://43.205.211.216:5000';
+    this.baseURL = process.env.REACT_APP_API_URL || 'https://44.194.207.22';
     
     this.api = axios.create({
       baseURL: this.baseURL,
@@ -66,7 +66,7 @@ class ApiService {
   // Generic API methods
   public async get<T>(endpoint: string, params?: any): Promise<ApiResponse<T>> {
     try {
-      const response = await this.api.get(`/api/v1${endpoint}`, { params });
+      const response = await this.api.get(`/v1${endpoint}`, { params });
       return response.data;
     } catch (error: any) {
       throw this.handleError(error);
@@ -109,7 +109,7 @@ class ApiService {
 
   public async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     try {
-      const response = await this.api.post(`/api/v1${endpoint}`, data);
+      const response = await this.api.post(`/v1${endpoint}`, data);
       return response.data;
     } catch (error: any) {
       throw this.handleError(error);
@@ -118,7 +118,7 @@ class ApiService {
 
   public async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     try {
-      const response = await this.api.put(`/api/v1${endpoint}`, data);
+      const response = await this.api.put(`/v1${endpoint}`, data);
       return response.data;
     } catch (error: any) {
       throw this.handleError(error);
@@ -127,7 +127,7 @@ class ApiService {
 
   public async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     try {
-      const response = await this.api.delete(`/api/v1${endpoint}`);
+      const response = await this.api.delete(`/v1${endpoint}`);
       return response.data;
     } catch (error: any) {
       throw this.handleError(error);
@@ -163,7 +163,7 @@ class ApiService {
 
   // Get base URL for API calls
   public getBaseURL(): string {
-    return this.baseURL + '/api/v1';
+    return this.baseURL + '/v1';
   }
 }
 
@@ -171,7 +171,7 @@ export const apiService = new ApiService();
 
 // Export getBase function for use in actions
 export const getBase = (): string => {
-  return process.env.REACT_APP_API_URL || 'http://43.205.211.216:5000';
+  return process.env.REACT_APP_API_URL || 'https://44.194.207.22';
 };
 
 export default apiService;
