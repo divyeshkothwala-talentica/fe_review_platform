@@ -14,11 +14,17 @@ const apiMiddleware: Middleware = (store) => (next) => async (action: any) => {
   const { types, url, method, data } = callAPI as IApiCall;
   const [requestType, successType, failureType] = types;
   
-  // Prevent books API calls when there's an authentication error
+  // Books API calls should be allowed for everyone (authenticated or not)
+  // Only prevent authenticated-only endpoints when there's an auth error
   const state = store.getState();
   const authState = state.auth;
-  if (url.includes('/books') && authState?.error && !authState?.data?.isAuthenticated) {
-    return; // Don't proceed with the API call
+  
+  // Only block authenticated-only endpoints (favorites, reviews, profile) when auth fails
+  const authenticatedOnlyEndpoints = ['/favorites', '/reviews', '/users/profile'];
+  const isAuthenticatedOnlyEndpoint = authenticatedOnlyEndpoints.some(endpoint => url.includes(endpoint));
+  
+  if (isAuthenticatedOnlyEndpoint && authState?.error && !authState?.data?.isAuthenticated) {
+    return; // Don't proceed with authenticated-only API calls when not authenticated
   }
 
   // Dispatch request action
