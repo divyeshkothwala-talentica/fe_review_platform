@@ -1,28 +1,16 @@
-# Example Terraform variables file
-# Copy this file to terraform.tfvars and update the values
-
 # AWS Configuration
 aws_region = "us-east-1"
+environment = "dev"
 
 # Project Configuration
-project_name = "fe-review-platform"
-environment  = "dev"
-
-# GitHub Repository (REQUIRED)
-# Format: "owner/repository-name"
-github_repository = "yourusername/fe_review_platform"
+project_name = "review-platform-frontend"
+bucket_name = "review-platform-frontend-dev-unique-suffix"
 
 # CloudFront Configuration
-cloudfront_price_class = "PriceClass_100"  # PriceClass_All, PriceClass_200, PriceClass_100
-cache_default_ttl      = 3600              # 1 hour
-cache_max_ttl          = 86400             # 24 hours
+cloudfront_price_class = "PriceClass_100"
 
-# S3 Configuration
-enable_versioning = true
+# GitHub Configuration (for CI/CD)
+github_repo = "your-username/your-repo-name"
 
-# Additional Tags
-tags = {
-  Owner       = "DevOps Team"
-  CostCenter  = "Engineering"
-  Application = "Review Platform"
-}
+# Backend Configuration
+backend_api_url = "http://43.205.211.216:5000"

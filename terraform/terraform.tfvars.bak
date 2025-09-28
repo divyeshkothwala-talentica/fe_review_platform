@@ -1,0 +1,16 @@
+# AWS Configuration
+aws_region = "us-east-1"
+environment = "dev"
+
+# Project Configuration
+project_name = "review-platform-frontend"
+bucket_name = "review-platform-frontend-dev-$(date +%s)"
+
+# CloudFront Configuration
+cloudfront_price_class = "PriceClass_100"
+
+# GitHub Configuration (IMPORTANT: Update with your actual repository)
+github_repo = "divyeshkothwala-talentica/fe_review_platform"
+
+# Backend Configuration
+backend_api_url = "http://43.205.211.216:5000"

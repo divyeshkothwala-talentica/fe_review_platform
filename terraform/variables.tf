@@ -1,15 +1,7 @@
-# Variables for Terraform configuration
-
 variable "aws_region" {
   description = "AWS region for resources"
   type        = string
   default     = "us-east-1"
-}
-
-variable "project_name" {
-  description = "Name of the project"
-  type        = string
-  default     = "fe-review-platform"
 }
 
 variable "environment" {
@@ -18,47 +10,42 @@ variable "environment" {
   default     = "dev"
 }
 
-variable "github_repository" {
-  description = "GitHub repository in format 'owner/repo'"
+variable "project_name" {
+  description = "Name of the project"
   type        = string
-  # This should be set when running terraform
-  # Example: "yourusername/fe_review_platform"
+  default     = "review-platform-frontend"
 }
 
-variable "cloudfront_price_class" {
-  description = "CloudFront price class"
+variable "bucket_name" {
+  description = "S3 bucket name for hosting frontend"
   type        = string
-  default     = "PriceClass_100"
   validation {
-    condition = contains([
-      "PriceClass_All",
-      "PriceClass_200",
-      "PriceClass_100"
-    ], var.cloudfront_price_class)
-    error_message = "CloudFront price class must be PriceClass_All, PriceClass_200, or PriceClass_100."
+    condition     = can(regex("^[a-z0-9][a-z0-9-]*[a-z0-9]$", var.bucket_name))
+    error_message = "Bucket name must be lowercase, start and end with alphanumeric characters, and can contain hyphens."
   }
 }
 
-variable "enable_versioning" {
-  description = "Enable S3 bucket versioning"
-  type        = bool
-  default     = true
+variable "cloudfront_price_class" {
+  description = "CloudFront distribution price class"
+  type        = string
+  default     = "PriceClass_100"
+  validation {
+    condition     = contains(["PriceClass_All", "PriceClass_200", "PriceClass_100"], var.cloudfront_price_class)
+    error_message = "Price class must be one of: PriceClass_All, PriceClass_200, PriceClass_100."
+  }
 }
 
-variable "cache_default_ttl" {
-  description = "Default TTL for CloudFront cache"
-  type        = number
-  default     = 3600
+variable "github_repo" {
+  description = "GitHub repository in format 'owner/repo-name'"
+  type        = string
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$", var.github_repo))
+    error_message = "GitHub repository must be in format 'owner/repo-name'."
+  }
 }
 
-variable "cache_max_ttl" {
-  description = "Maximum TTL for CloudFront cache"
-  type        = number
-  default     = 86400
-}
-
-variable "tags" {
-  description = "Additional tags to apply to resources"
-  type        = map(string)
-  default     = {}
+variable "backend_api_url" {
+  description = "Backend API URL for frontend configuration"
+  type        = string
+  default     = "http://43.205.211.216:5000"
 }
