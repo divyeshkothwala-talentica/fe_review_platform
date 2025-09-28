@@ -62,7 +62,7 @@ const BookListing: React.FC = () => {
       initialBooksLoadedRef.current = true;
       dispatch(getBooksAction({ page: 1, limit: itemsPerPage }) as any);
     }
-  }, [dispatch, isSearching, booksState.data.books.length]);
+  }, [dispatch, isSearching, booksState.data.books.length, authState.error, authState.loading]);
 
   // Fetch user favorites when user logs in (bulk fetch - more efficient)
   useEffect(() => {
@@ -71,7 +71,7 @@ const BookListing: React.FC = () => {
     if (isAuthenticated && authState.data.token && authState.data.user && !authState.error) {
       dispatch(getFavoritesAction(0, 50, false) as any);
     }
-  }, [isAuthenticated, dispatch]); // Removed token and user from dependencies to prevent triggering on auth failures
+  }, [isAuthenticated, dispatch, authState.data.token, authState.data.user, authState.error]);
 
   // Process fetched favorites and update heart icon states
   useEffect(() => {

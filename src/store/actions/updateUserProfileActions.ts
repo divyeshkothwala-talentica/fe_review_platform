@@ -2,7 +2,6 @@ import { HttpMethod } from '../../common/resources';
 import { IActionGenerator } from '../../common/interface';
 import { URLS } from '../../common/urls';
 import { CALL_API } from '../../middlewares/api';
-import { getBase } from '../../services/api';
 
 export const UPDATE_USER_PROFILE_REQUEST = 'UPDATE_USER_PROFILE_REQUEST';
 export const UPDATE_USER_PROFILE_SUCCESS = 'UPDATE_USER_PROFILE_SUCCESS';
