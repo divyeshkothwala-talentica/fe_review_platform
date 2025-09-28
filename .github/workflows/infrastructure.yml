@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - 'deployment/terraform/**'
+      - 'terraform/**'
   pull_request:
     branches:
       - main
     paths:
-      - 'deployment/terraform/**'
+      - 'terraform/**'
   workflow_dispatch:
     inputs:
       action:
@@ -54,19 +54,19 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
       
       - name: Terraform Format Check
-        working-directory: ./deployment/terraform
+        working-directory: ./terraform
         run: terraform fmt -check
       
       - name: Terraform Init
-        working-directory: ./deployment/terraform
+        working-directory: ./terraform
         run: terraform init
       
       - name: Terraform Validate
-        working-directory: ./deployment/terraform
+        working-directory: ./terraform
         run: terraform validate
       
       - name: Terraform Plan
-        working-directory: ./deployment/terraform
+        working-directory: ./terraform
         run: |
           terraform plan \
             -var="bucket_name=${{ secrets.S3_BUCKET_NAME }}" \
@@ -78,7 +78,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: terraform-plan
-          path: ./deployment/terraform/tfplan
+          path: ./terraform/tfplan
           retention-days: 5
 
   terraform-apply:
@@ -106,11 +106,11 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
       
       - name: Terraform Init
-        working-directory: ./deployment/terraform
+        working-directory: ./terraform
         run: terraform init
       
       - name: Terraform Apply
-        working-directory: ./deployment/terraform
+        working-directory: ./terraform
         run: |
           terraform apply -auto-approve \
             -var="bucket_name=${{ secrets.S3_BUCKET_NAME }}" \
@@ -144,11 +144,11 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
       
       - name: Terraform Init
-        working-directory: ./deployment/terraform
+        working-directory: ./terraform
         run: terraform init
       
       - name: Terraform Destroy
-        working-directory: ./deployment/terraform
+        working-directory: ./terraform
         run: |
           terraform destroy -auto-approve \
             -var="bucket_name=${{ secrets.S3_BUCKET_NAME }}" \

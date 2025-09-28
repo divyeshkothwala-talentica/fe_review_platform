@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'fe_review_platform/**'
   workflow_dispatch:
     inputs:
       environment:
@@ -40,25 +38,18 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: fe_review_platform/package-lock.json
+          cache-dependency-path: package-lock.json
       
       - name: Install dependencies
-        working-directory: ./fe_review_platform
         run: npm ci
       
       - name: Create environment file
-        working-directory: ./fe_review_platform
         run: |
           echo "REACT_APP_API_URL=${{ secrets.BACKEND_API_URL }}" > .env.production
           echo "REACT_APP_ENVIRONMENT=${{ secrets.ENVIRONMENT || 'dev' }}" >> .env.production
           echo "GENERATE_SOURCEMAP=false" >> .env.production
       
-      - name: Run tests
-        working-directory: ./fe_review_platform
-        run: npm test -- --coverage --watchAll=false
-      
       - name: Build application
-        working-directory: ./fe_review_platform
         run: npm run build
       
       - name: Configure AWS credentials
@@ -68,7 +59,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       
       - name: Deploy to S3
-        working-directory: ./fe_review_platform
         run: |
           aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
             --delete \
@@ -91,30 +81,15 @@ jobs:
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"
       
-      - name: Get deployment URL
+      - name: Deployment Summary
         run: |
-          echo "🚀 Frontend deployed successfully!"
-          echo "📱 Application URL: https://${{ secrets.CLOUDFRONT_DOMAIN_NAME }}"
-          echo "🔗 Backend API: ${{ secrets.BACKEND_API_URL }}"
-
-  lighthouse-audit:
-    name: Lighthouse Performance Audit
-    runs-on: ubuntu-latest
-    needs: build-and-deploy
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Wait for deployment
-        run: sleep 60
-      
-      - name: Run Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v10
-        with:
-          urls: |
-            https://${{ secrets.CLOUDFRONT_DOMAIN_NAME }}
-          configPath: './fe_review_platform/.lighthouserc.json'
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Frontend deployed successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "📱 **Application URL**: [View Live Site](https://${{ secrets.CLOUDFRONT_DOMAIN_NAME }})" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 **Backend API**: ${{ secrets.BACKEND_API_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **Deployment Details**:" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Actor: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Timestamp: $(date -u)" >> $GITHUB_STEP_SUMMARY

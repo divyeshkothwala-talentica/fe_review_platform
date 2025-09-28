@@ -2,6 +2,8 @@
 
 A React-based frontend for the Book Review Platform with automated AWS deployment using S3 and CloudFront.
 
+🔄 **Auto-Deployment Active**: Changes to main branch automatically deploy to production!
+
 ## 🚀 Quick Start with CI/CD
 
 **Option 1: Automated Setup (Recommended)**
